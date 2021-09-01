@@ -13,6 +13,7 @@ import retrofit2.Retrofit;
 import wook.co.weather.interfaces.OpenWeatherAPI;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.retrofit.RetrofitService;
+import wook.co.weather.view.MainActivity;
 
 public class OpenWeatherRepos {
     //이 클래스에서는 API 통신을 통해서 데이터를 가져와야 한다.
@@ -41,23 +42,22 @@ public class OpenWeatherRepos {
         opwAPI = retrofit.create(OpenWeatherAPI.class);
 
         //API와 통신을 하는 함수 호출
-        MutableLiveData<OpenWeather> data = new MutableLiveData<OpenWeather>();
         opw = new OpenWeather();
-        callWeatherAPI();
-        Log.i(TAG,opw.toString());
-        data.setValue(opw);
+        MutableLiveData<OpenWeather> data = new MutableLiveData<OpenWeather>();
+        callWeatherAPI(data);
         return data;
     }
 
-    private void callWeatherAPI() {
+    private void callWeatherAPI(MutableLiveData<OpenWeather> data) {
 
         //응답을 받아오는 부분
         Call<OpenWeather> call = opwAPI.getWeather("seoul","d0a0f80f34551266ab6f092780304575","kr");
 
         call.enqueue(new Callback<OpenWeather>() {
+            //아래 함수들은 callback 함수들로써 연결이 완료되면 호출이 되는 부분이다.
             @Override
             public void onResponse(Call<OpenWeather> call, Response<OpenWeather> response) {
-                opw = response.body();
+                data.setValue(response.body());
                 Log.i(TAG,"API CONNECT SUCCESS");
             }
 
