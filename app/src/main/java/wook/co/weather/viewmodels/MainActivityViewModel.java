@@ -4,10 +4,12 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.repository.OpenWeatherRepos;
+import wook.co.weather.view.MainActivity;
 
 public class MainActivityViewModel extends ViewModel {
 
