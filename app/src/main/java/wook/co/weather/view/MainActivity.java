@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         mavm.getWeather().observe(this, new Observer<OpenWeather>() {
             @Override
             public void onChanged(OpenWeather openWeather) {
-                Log.i(TAG,"API Connection finish");
                 opw = mavm.getWeather().getValue();
                 Log.i(TAG,opw.toString());
             }
