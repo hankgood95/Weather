@@ -4,8 +4,6 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -13,7 +11,6 @@ import retrofit2.Retrofit;
 import wook.co.weather.interfaces.OpenWeatherAPI;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.retrofit.RetrofitService;
-import wook.co.weather.view.MainActivity;
 
 public class OpenWeatherRepos {
     //이 클래스에서는 API 통신을 통해서 데이터를 가져와야 한다.
@@ -35,7 +32,7 @@ public class OpenWeatherRepos {
     //날씨 정보를 직접적으러 받아와야 하는 부분
     public MutableLiveData<OpenWeather> getWeather() {
 
-        //Retrofit 인스턴스 생성
+        //Retrofit 객체 생성 생성
         retrofit = new RetrofitService().getRetroInstance(BASE_URL);
 
         //인터페이스 객체 생성
@@ -50,15 +47,21 @@ public class OpenWeatherRepos {
 
     private void callWeatherAPI(MutableLiveData<OpenWeather> data) {
 
-        //응답을 받아오는 부분
+        //응답을 하고 받아오는 부분
         Call<OpenWeather> call = opwAPI.getWeather("seoul","d0a0f80f34551266ab6f092780304575","kr");
 
         call.enqueue(new Callback<OpenWeather>() {
             //아래 함수들은 callback 함수들로써 연결이 완료되면 호출이 되는 부분이다.
             @Override
             public void onResponse(Call<OpenWeather> call, Response<OpenWeather> response) {
-                data.setValue(response.body());
-                Log.i(TAG,"API CONNECT SUCCESS");
+                if(response.isSuccessful()){ //연결이 성공적으로 되었을때 진입하는 부분
+                    data.postValue(response.body());
+                    Log.i(TAG,"API CONNECT SUCCESS");
+                }else{ //400번대나 500번대 에러가 나면 여기로 오게됨
+                    opw.setCod(response.code());
+                    Log.i(TAG,"API CONNECT SUCCESS BUT WRONG PARAMETER");
+                    data.postValue(opw);
+                }
             }
 
             @Override
@@ -67,5 +70,4 @@ public class OpenWeatherRepos {
             }
         });
     }
-
 }

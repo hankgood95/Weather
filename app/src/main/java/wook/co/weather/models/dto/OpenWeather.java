@@ -37,7 +37,20 @@ public class OpenWeather {
     @SerializedName("name")
     private String name; //도시이름
     @SerializedName("cod")
-    private int cod; //내부 매개변수
+    private int cod; //응답코드
+
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setCod(int cod) {
+        this.cod = cod;
+        if(cod >= 400){
+            this.message = "날씨 정보 요청은 했으나 요청의 오류로 데이터를 받아오지 못했습니다.";
+        }
+    }
 
     public Coord getCoord() {
         return coord;
@@ -117,6 +130,7 @@ public class OpenWeather {
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", cod=" + cod +
+                ", message='" + message + '\'' +
                 '}';
     }
 }
