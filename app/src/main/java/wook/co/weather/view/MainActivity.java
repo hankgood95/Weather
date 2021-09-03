@@ -23,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //intent 수신받아서
         Intent intent = getIntent();
 
+        //intent에 실은 OpenWeather 객체를 가져옴
         opw = (OpenWeather)intent.getSerializableExtra("openWeather");
         Log.i(TAG,opw.toString());
 

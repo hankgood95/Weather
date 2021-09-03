@@ -34,7 +34,9 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onChanged(OpenWeather openWeather) {
                 opw = mavm.getWeather().getValue();
+                //intent 형성한다.
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                //해당 intent에 객체를 실어서 보낸다.
                 intent.putExtra("openWeather",opw);
                 Log.i(TAG,opw.toString());
                 startActivity(intent);
