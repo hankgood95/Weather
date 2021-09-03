@@ -2,7 +2,9 @@ package wook.co.weather.models.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Sys {
+import java.io.Serializable;
+
+public class Sys implements Serializable {
     @SerializedName("country")
     public String country;
     @SerializedName("sunrise")

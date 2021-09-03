@@ -2,10 +2,11 @@ package wook.co.weather.models.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class OpenWeather {
+public class OpenWeather implements Serializable {
 
     @SerializedName("coord")
     private Coord coord;

@@ -2,7 +2,9 @@ package wook.co.weather.models.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Snow {
+import java.io.Serializable;
+
+public class Snow implements Serializable {
     @SerializedName("3h")
     private float h3;
     @SerializedName("1h")
