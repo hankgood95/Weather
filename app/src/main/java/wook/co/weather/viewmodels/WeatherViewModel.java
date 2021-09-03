@@ -11,7 +11,7 @@ import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.repository.OpenWeatherRepos;
 import wook.co.weather.view.MainActivity;
 
-public class MainActivityViewModel extends ViewModel {
+public class WeatherViewModel extends ViewModel {
 
     private final String TAG = "MainActivityViewModel";
 

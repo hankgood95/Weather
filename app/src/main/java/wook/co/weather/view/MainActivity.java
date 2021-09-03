@@ -1,24 +1,20 @@
 package wook.co.weather.view;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.icu.util.Measure;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import wook.co.weather.R;
 import wook.co.weather.models.dto.OpenWeather;
-import wook.co.weather.viewmodels.MainActivityViewModel;
+import wook.co.weather.viewmodels.WeatherViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MainActivityViewModel mavm;
+    private WeatherViewModel mavm;
     private final String TAG = "MainActivity";
     private OpenWeather opw;
 
@@ -27,17 +23,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mavm = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        mavm.init();
-        //여기서 바뀐 값들이 뭐가 있는지 확인하는 부분
+        Intent intent = getIntent();
 
-        //ViewModel로부터 값을 LiveData를 가져온후 해당 값에 변경사항이 있을때 아래 함수를 호출하게 된다.
-        mavm.getWeather().observe(this, new Observer<OpenWeather>() {
-            @Override
-            public void onChanged(OpenWeather openWeather) {
-                opw = mavm.getWeather().getValue();
-                Log.i(TAG,opw.toString());
-            }
-        });
+        opw = (OpenWeather)intent.getSerializableExtra("openWeather");
+        Log.i(TAG,opw.toString());
+
+//        mavm = new ViewModelProvider(this).get(WeatherViewModel.class);
+//        mavm.init();
+//        //여기서 바뀐 값들이 뭐가 있는지 확인하는 부분
+//
+//        //ViewModel로부터 값을 LiveData를 가져온후 해당 값에 변경사항이 있을때 아래 함수를 호출하게 된다.
+//        mavm.getWeather().observe(this, new Observer<OpenWeather>() {
+//            @Override
+//            public void onChanged(OpenWeather openWeather) {
+//                opw = mavm.getWeather().getValue();
+//                Log.i(TAG,opw.toString());
+//            }
+//        });
     }
 }

@@ -2,7 +2,9 @@ package wook.co.weather.models.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Wind {
+import java.io.Serializable;
+
+public class Wind implements Serializable {
     @SerializedName("speed")
     private float speed;
     @SerializedName("deg")

@@ -2,7 +2,9 @@ package wook.co.weather.models.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Coord {
+import java.io.Serializable;
+
+public class Coord implements Serializable {
     @SerializedName("lon")
     private float lon;
     @SerializedName("lat")
