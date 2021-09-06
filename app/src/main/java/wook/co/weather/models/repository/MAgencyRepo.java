@@ -58,15 +58,14 @@ public class MAgencyRepo {
             @Override
             public void onResponse(Call<ShortWeather> call, Response<ShortWeather> response) {
                 if(response.isSuccessful()){ //연결이 성공적으로 되었을때 진입하는 부분
+                    //해당 api는 오류가 생기더라도 여기로 오고 대신에 들어고는 resultCode값에 따라서 오류인것과 아닌것을 나눈다.
                     data.postValue(response.body());
                     Log.i(TAG,"API CONNECT SUCCESS");
-                    Log.i(TAG,response.body().toString());
-                }else{ //400번대나 500번대 에러가 나면 여기로 오게됨
-                    Log.i(TAG,"API CONNECT SUCCESS BUT WRONG PARAMETER");
                     Log.i(TAG,response.body().toString());
                 }
             }
 
+            //인증키 관련해서 잘못 된 부분만 onFailure에 오게 됨
             @Override
             public void onFailure(Call<ShortWeather> call, Throwable t) {
                 Log.d(TAG,"onFailure : "+t.getMessage());
