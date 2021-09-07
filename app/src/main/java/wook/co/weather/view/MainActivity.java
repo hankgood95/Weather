@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         //intent 수신받아서
         Intent intent = getIntent();
-
         sw = (ShortWeather) intent.getSerializableExtra("shortWeather");
         Log.i(TAG,sw.toString());
 
