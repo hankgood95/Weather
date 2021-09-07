@@ -1,7 +1,17 @@
 package wook.co.weather.models.repository;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import retrofit2.Call;
@@ -10,9 +20,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import wook.co.weather.interfaces.MeteorologicalAgencyAPI;
 import wook.co.weather.interfaces.OpenWeatherAPI;
+import wook.co.weather.models.dto.Coord;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
 import wook.co.weather.models.retrofit.RetrofitService;
+import wook.co.weather.view.MainActivity;
 
 public class MAgencyRepo {
 
@@ -52,7 +64,7 @@ public class MAgencyRepo {
 
         //응답을 하고 받아오는 부분
         Call<ShortWeather> call = MaAPI.getShortWeather("0gr5uJKYx6b+lhmOt+Dm+fbcxVdiG7U407njrJ3YSFLlrckPeysX5fHfT0dwQRHHs4m0z5ELtDx9jcZ/Z3qoVA==",
-                50,1,"JSON","20210906","0500",55,127);
+                50,1,"JSON","20210907","0500",55,127);
 
         call.enqueue(new Callback<ShortWeather>() {
             @Override
@@ -72,4 +84,5 @@ public class MAgencyRepo {
             }
         });
     }
+
 }
