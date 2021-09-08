@@ -77,6 +77,12 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
                 }
             }else{ //위치정보를 허가받지 못했을경우 진입
                 Toast.makeText(getApplicationContext(),"위치정보를 승인하지 않으면 현재위치 기반으로 \n날씨정보를 알려드릴수 없습니다.",Toast.LENGTH_LONG).show();
+                Log.i(TAG,"위치정보를 허가 안해줌");
+                //허가를 받지 못했을땐 default로 원주시의 날씨를 받아오게하기 위해서 만들었다.
+                gpt = new GpsTransfer();
+                gpt.setxLat(76);
+                gpt.setyLon(122);
+                gpt.transfer(gpt,1);
                 getWeather(mavm);
             }
         }

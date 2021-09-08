@@ -8,10 +8,14 @@ public class GpsTransfer {
     private double xLat; //x좌표로 변환된 위도
     private double yLon; //y좌표로 변환된 경도
 
+    public GpsTransfer() {}
+
     public GpsTransfer(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
     }
+
+
 
     public double getLat() {
         return lat;
