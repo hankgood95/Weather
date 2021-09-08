@@ -21,6 +21,7 @@ import retrofit2.Retrofit;
 import wook.co.weather.interfaces.MeteorologicalAgencyAPI;
 import wook.co.weather.interfaces.OpenWeatherAPI;
 import wook.co.weather.models.dto.Coord;
+import wook.co.weather.models.dto.GpsTransfer;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
 import wook.co.weather.models.retrofit.RetrofitService;
@@ -45,7 +46,7 @@ public class MAgencyRepo {
     }
 
     //날씨 정보를 직접적으러 받아와야 하는 부분
-    public MutableLiveData<ShortWeather> getWeather() {
+    public MutableLiveData<ShortWeather> getWeather(GpsTransfer gpt) {
 
         //Retrofit 객체 생성 생성
         retrofit = new RetrofitService().getRetroInstance(BASE_URL);
@@ -56,15 +57,17 @@ public class MAgencyRepo {
         //API와 통신을 하는 함수 호출
         sw = new ShortWeather();
         MutableLiveData<ShortWeather> data = new MutableLiveData<ShortWeather>();
-        callWeatherAPI(data);
+        callWeatherAPI(data, gpt);
         return data;
     }
 
-    private void callWeatherAPI(MutableLiveData<ShortWeather> data) {
+    private void callWeatherAPI(MutableLiveData<ShortWeather> data, GpsTransfer gpt) {
 
+        int nx = (int) gpt.getxLat();
+        int ny = (int) gpt.getyLon();
         //응답을 하고 받아오는 부분
         Call<ShortWeather> call = MaAPI.getShortWeather("0gr5uJKYx6b+lhmOt+Dm+fbcxVdiG7U407njrJ3YSFLlrckPeysX5fHfT0dwQRHHs4m0z5ELtDx9jcZ/Z3qoVA==",
-                50,1,"JSON","20210907","0500",55,127);
+                50,1,"JSON","20210908","0500",nx,ny);
 
         call.enqueue(new Callback<ShortWeather>() {
             @Override

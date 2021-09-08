@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import wook.co.weather.models.dto.Coord;
+import wook.co.weather.models.dto.GpsTransfer;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
 import wook.co.weather.models.repository.MAgencyRepo;
@@ -32,12 +33,12 @@ public class MAgencyViewModel extends ViewModel {
 
     private LocationManager lm; //핸드폰에 있는 gps관련 기기와 상호작용하기 위해서
 
-    public void init(){
+    public void init(GpsTransfer gpt){
         if(sw != null){
             return;
         }
         maRepo = MAgencyRepo.getInStance();
-        sw = maRepo.getWeather();
+        sw = maRepo.getWeather(gpt);
         Log.i(TAG,"API Connection finish");
     }
 

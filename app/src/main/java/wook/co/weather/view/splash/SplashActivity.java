@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import wook.co.weather.R;
 import wook.co.weather.models.dto.Coord;
+import wook.co.weather.models.dto.GpsTransfer;
 import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
 import wook.co.weather.view.MainActivity;
@@ -34,6 +35,7 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
     private final String TAG = "SplashActivity";
     private LocationManager lm;
     private Coord coord;
+    private GpsTransfer gpt;
 
 
     @Override
@@ -57,8 +59,7 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
         }else {
             //위치정보 권한이 허용되어 있을때 실행하는 코드
             Log.d(TAG, "위치정보 허용됨");
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
-            getWeather(mavm);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this); //위치정보를 update 한다.
         }
 
     }
@@ -69,8 +70,12 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
 
         if(requestCode == 200){ //permissionCode가 200이고
             if(grantResults[0] == 0){ // 그중 가장 첫번째 result가 0 즉 승인된경우 진입
-                Toast.makeText(getApplicationContext(),"위치정보 승인됨",Toast.LENGTH_SHORT).show();
-            }else{
+                Toast.makeText(getApplicationContext(),"위치정보 승인됨",Toast.LENGTH_SHORT).show(); //위치정보 승인됐다고 알리고
+                //위치정보 권한을 받았다면 진입
+                if(ActivityCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this); //위치정보를 update하는 함수
+                }
+            }else{ //위치정보를 허가받지 못했을경우 진입
                 Toast.makeText(getApplicationContext(),"위치정보를 승인하지 않으면 현재위치 기반으로 \n날씨정보를 알려드릴수 없습니다.",Toast.LENGTH_LONG).show();
                 getWeather(mavm);
             }
@@ -78,7 +83,7 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
     }
 
     public void getWeather(MAgencyViewModel mavm){
-        mavm.init();
+        mavm.init(gpt);
         mavm.getWeather().observe(this, new Observer<ShortWeather>() {
             @Override
             public void onChanged(ShortWeather shortWeather) {
@@ -91,6 +96,7 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
                     public void run() {
                         //intent 형성한다.
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);//액티비티 스택제거
                         //해당 intent에 객체를 실어서 보낸다.
                         intent.putExtra("shortWeather",sw);
                         startActivity(intent);
@@ -102,13 +108,19 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
 
     @Override
     public void onLocationChanged(Location location) {
-        coord.setLat(location.getLatitude());
-        coord.setLon(location.getLongitude());
-        Log.d(TAG,coord.toString());
+        Log.d(TAG, "위치정보 업데이트중");
+        coord.setLat(location.getLatitude()); //위도를 입력
+        coord.setLon(location.getLongitude()); //경도를 입력
+        Log.i(TAG,coord.toString()); //입력한 위도와 경두를 출력
 
+        gpt = new GpsTransfer(coord.getLat(),coord.getLon());
+        gpt.transfer(gpt,0);
+        Log.i(TAG,gpt.toString()); //입력한 위도와 경두를 출력
         //이건 이제 한번 update하고 나서 위치를 업데이트 다시 안시키기 위해서 하는것임
         //이걸 하지 않으면 위치정보를 계속해서 update하기때문에 배터리 소모하게됨
         lm.removeUpdates(this);
+
+        getWeather(mavm); //전달받은 위치정보로 날씨정보 API를 호출
     }
 
     @Override
