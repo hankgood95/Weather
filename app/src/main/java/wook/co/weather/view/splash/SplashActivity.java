@@ -59,7 +59,8 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
         }else {
             //위치정보 권한이 허용되어 있을때 실행하는 코드
             Log.d(TAG, "위치정보 허용됨");
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this); //위치정보를 update 한다.
+//            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this); //위치정보를 update 한다. 이건 실제 기기용
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this); //위치정보를 update 한다. 이건 에뮬레이터용
         }
 
     }
@@ -73,7 +74,8 @@ public class SplashActivity extends AppCompatActivity implements LocationListene
                 Toast.makeText(getApplicationContext(),"위치정보 승인됨",Toast.LENGTH_SHORT).show(); //위치정보 승인됐다고 알리고
                 //위치정보 권한을 받았다면 진입
                 if(ActivityCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this); //위치정보를 update하는 함수
+//                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this); //위치정보를 update하는 함수 이건 실제 기기용
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this); //위치정보를 update 한다. 이건 에뮬레이터용
                 }
             }else{ //위치정보를 허가받지 못했을경우 진입
                 Toast.makeText(getApplicationContext(),"위치정보를 승인하지 않으면 현재위치 기반으로 \n날씨정보를 알려드릴수 없습니다.",Toast.LENGTH_LONG).show();
