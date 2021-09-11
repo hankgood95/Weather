@@ -1,17 +1,13 @@
 package wook.co.weather.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import wook.co.weather.R;
-import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
-import wook.co.weather.viewmodels.WeatherViewModel;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,17 +1,7 @@
 package wook.co.weather.models.repository;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import retrofit2.Call;
@@ -19,13 +9,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import wook.co.weather.interfaces.MeteorologicalAgencyAPI;
-import wook.co.weather.interfaces.OpenWeatherAPI;
-import wook.co.weather.models.dto.Coord;
+import wook.co.weather.models.dto.GeoInfo;
 import wook.co.weather.models.dto.GpsTransfer;
-import wook.co.weather.models.dto.OpenWeather;
 import wook.co.weather.models.dto.ShortWeather;
 import wook.co.weather.models.retrofit.RetrofitService;
-import wook.co.weather.view.MainActivity;
 
 public class MAgencyRepo {
 
@@ -46,7 +33,7 @@ public class MAgencyRepo {
     }
 
     //날씨 정보를 직접적으러 받아와야 하는 부분
-    public MutableLiveData<ShortWeather> getWeather(GpsTransfer gpt) {
+    public MutableLiveData<ShortWeather> getWeather(GeoInfo gi) {
 
         //Retrofit 객체 생성 생성
         retrofit = new RetrofitService().getRetroInstance(BASE_URL);
@@ -57,17 +44,21 @@ public class MAgencyRepo {
         //API와 통신을 하는 함수 호출
         sw = new ShortWeather();
         MutableLiveData<ShortWeather> data = new MutableLiveData<ShortWeather>();
-        callWeatherAPI(data, gpt);
+        callWeatherAPI(data, gi);
         return data;
     }
 
-    private void callWeatherAPI(MutableLiveData<ShortWeather> data, GpsTransfer gpt) {
+    private void callWeatherAPI(MutableLiveData<ShortWeather> data, GeoInfo gi) {
 
-        int nx = (int) gpt.getxLat();
-        int ny = (int) gpt.getyLon();
+        int nx = (int) gi.getLat();
+        int ny = (int) gi.getLon();
+
+        String baseDate = gi.getCallDate();
+
+
         //응답을 하고 받아오는 부분
         Call<ShortWeather> call = MaAPI.getShortWeather("0gr5uJKYx6b+lhmOt+Dm+fbcxVdiG7U407njrJ3YSFLlrckPeysX5fHfT0dwQRHHs4m0z5ELtDx9jcZ/Z3qoVA==",
-                50,1,"JSON","20210908","0500",nx,ny);
+                266,1,"JSON",baseDate,"2300",nx,ny);
 
         call.enqueue(new Callback<ShortWeather>() {
             @Override
