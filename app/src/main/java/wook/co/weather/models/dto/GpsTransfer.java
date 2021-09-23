@@ -82,7 +82,7 @@ public class GpsTransfer {
         double ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
         ro = re * sf / Math.pow(ro, sn);
 
-        if (mode == 0) {
+        if (mode == 0) { //mode가 0이면 위도와 경도를 x와 y좌표로 변경
 //            rs.lat = lat_X; //gps 좌표 위도
 //            rs.lng = lng_Y; //gps 좌표 경도
             double ra = Math.tan(Math.PI * 0.25 + (gpt.getLat()) * DEGRAD * 0.5);
