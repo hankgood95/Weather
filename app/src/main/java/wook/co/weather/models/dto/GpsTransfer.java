@@ -1,6 +1,10 @@
 package wook.co.weather.models.dto;
 
+import android.util.Log;
+
 public class GpsTransfer {
+
+    private final String TAG = "GpsTransfer";
 
     private double lat; //gps로 반환받은 위도
     private double lon; //gps로 반환받은 경도
@@ -52,6 +56,7 @@ public class GpsTransfer {
     //x,y좌표로 변환해주는것
     public void transfer(GpsTransfer gpt, int mode){
 
+        Log.d(TAG,"Transfer Complete");
         double RE = 6371.00877; // 지구 반경(km)
         double GRID = 5.0; // 격자 간격(km)
         double SLAT1 = 30.0; // 투영 위도1(degree)
