@@ -3,6 +3,7 @@ package wook.co.weather.viewmodels;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,12 +15,23 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
+
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,47 +44,56 @@ import wook.co.weather.models.repository.MAgencyRepo;
 import wook.co.weather.view.MainActivity;
 import wook.co.weather.view.splash.SplashActivity;
 
-public class MAgencyViewModel extends ViewModel implements LocationListener {
+public class MAgencyViewModel extends AndroidViewModel { //ViewModel과 AndroidViewModel의 차이점은 Application의 유무이다.
 
     private final String TAG = "MAgencyViewModel";
 
     //이 클래스에서는 Model과 통신하여서 날씨 정보를 받아온다.
     private MutableLiveData<ShortWeather> sw;
+    private MutableLiveData<GeoInfo> mldGi;
     private MAgencyRepo maRepo;
     private GeoInfo gi;
     private GpsTransfer gpt;
 
-//    public void init(GeoInfo gi) {
-//        if (sw != null) {
-//            return;
-//        }
-//
-//        maRepo = MAgencyRepo.getInStance();
-//        sw = maRepo.getWeather(gi); // this part is calling a weather api
-//        Log.i(TAG, "API Connection finish");
-//    }
+    private LocationCallback lcb;
+    private LocationRequest lr;
+    public boolean requestLocationUpdate;
 
-    public LiveData<ShortWeather> getWeather() {
-        return sw;
-    }
+    public MAgencyViewModel(@NonNull Application application) {
+        super(application);
+        Log.d(TAG,"LocationCallBack instance have been made");
+        //LocationCallBack 부분 객체 생성하고 그에 LocatinResult 받았을때를 추상화 시켜주는 부분
+        gpt = new GpsTransfer();
+        lcb = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult){
+                if(locationResult == null){
+                    Log.d(TAG,"Location information have not been recieved");
+                    return;
+                }
+                Log.d(TAG,"Location information have been recieved");
+                //gps를 통하여서 위도와 경도를 입력받는다.
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        gpt.setLon(location.getLongitude());
+                        gpt.setLat(location.getLatitude());
+                    }
+                }
 
-    @SuppressLint("MissingPermission")
-    //이부분은 권한 재확인 안하게 해주는 부분이다. 따로 재확인을 안하는 이유는 Activity단에서 이미 확인을 거쳤기 때문이다.
-    public void locationUpdate(LocationManager lm) {
-        Log.i(TAG, "locationUpdate()");
-//        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,this); //위치정보를 update하는 함수 이건 실제 기기용
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this); //After this nothing is happening
-    }
+                //gps 연결을 닫는다.
+                LocationServices.getFusedLocationProviderClient(getApplication()).removeLocationUpdates(lcb);
 
-    //여기서는 이제 위치 정보가 변경 되었을때 진입하는 부분
-    @Override
-    public void onLocationChanged(Location location) { //This CallBack method is not working
-        Log.i(TAG, "onLocationChanged()");
+                //x,y 좌표로 변환
+                gpt.transfer(gpt,0);
+                Log.d(TAG, gpt.toString());
+                setGeoInfo(gpt); //변환된 정보를 GeoInfo에 넣음
+                mldGi.setValue(gi);
+            }
+        };
     }
 
     //위치 정보 이용 권한 허가를 받지 못했을떄 호출 하는 부분
     public void defaultLocation() {
-
 
         //GpsTransfer 객체 생성
         gpt = new GpsTransfer();
@@ -82,20 +103,35 @@ public class MAgencyViewModel extends ViewModel implements LocationListener {
         gpt.setyLon(122);
         gpt.transfer(gpt, 1);
 
-        gi = new GeoInfo();
+        setGeoInfo(gpt);
+        callApi(gi);
 
+    }
+
+    @SuppressLint("MissingPermission")//위치권한 체크안해도 된다고 하는 부분 안하는 이유는 SplashActivity에서 이미 했기 때문이다.
+    public void requestUpdate(LocationRequest locationRequest){
+
+        Log.d(TAG,"LocationRequest have been request");
+        mldGi = new MutableLiveData<GeoInfo>();
+        requestLocationUpdate = true;
+        LocationServices.getFusedLocationProviderClient(getApplication())
+                .requestLocationUpdates(locationRequest,lcb,null);
+    }
+
+    public void setGeoInfo(GpsTransfer gpt){
+        gi = new GeoInfo();
         gi.setLon(gpt.getyLon());
         gi.setLat(gpt.getxLat());
-
         getTime();
+    }
 
+    public void callApi(GeoInfo geoInfo){
         if (sw != null) {
             return;
         }
-
         //해당 정보를 API를 호출
         maRepo = MAgencyRepo.getInStance();
-        sw = maRepo.getWeather(gi); // this part is calling a weather api
+        sw = maRepo.getWeather(geoInfo); // this part is calling a weather api
         Log.i(TAG, "API Connection finish");
     }
 
@@ -124,18 +160,8 @@ public class MAgencyViewModel extends ViewModel implements LocationListener {
 
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
+    public LiveData<ShortWeather> getWeather() {
+        return sw;
     }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
+    public LiveData<GeoInfo> getGeo(){ return mldGi; }
 }
