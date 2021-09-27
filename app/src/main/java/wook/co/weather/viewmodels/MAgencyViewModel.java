@@ -32,6 +32,7 @@ public class MAgencyViewModel extends ViewModel {
         Log.i(TAG,"API Connection finish");
     }
 
+
     public LiveData<ShortWeather> getWeather(){
         return sw;
     }
