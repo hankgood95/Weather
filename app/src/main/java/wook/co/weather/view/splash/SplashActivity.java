@@ -3,18 +3,27 @@ package wook.co.weather.view.splash;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
@@ -42,17 +51,18 @@ import wook.co.weather.viewmodels.MAgencyViewModel;
 
 public class SplashActivity extends AppCompatActivity{
 
-    private ShortWeather sw;
-    private MAgencyViewModel mavm;
-    private final String TAG = "SplashActivity";
 
+    private final String TAG = "SplashActivity";
     private final int DEFAULT_LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY; //배터리와 정확도를 밸런스있게 맞춰주는애
     private final long DEFAULT_LOCATION_REQUEST_INTERVAL = 2000L;
     private final long DEFAULT_LOCATION_REQUEST_FAST_INTERVAL = 10000L;
 
     private LocationRequest lr; //위치정보를 사용하기 위해서 사용하는 변수
-    private FusedLocationProviderClient flpc;
+    private ShortWeather sw;
+    private MAgencyViewModel mavm; //ViewModel 변수
 
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +71,52 @@ public class SplashActivity extends AppCompatActivity{
         mavm = new ViewModelProvider(this).get(MAgencyViewModel.class);
         //LocationRequest 객체 생성
         lr = LocationRequest.create();
-        checkLocationPermission();
+        if(isNetworkAvailable(this)){
+            checkLocationPermission();
+        }else{
+            AlertDialog.Builder tryAgain = new AlertDialog.Builder(this);
+            tryAgain.setMessage("서버와 연결이 불안정합니다.\n 다시 시도해 주세요");
+            tryAgain.setPositiveButton("종료", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            tryAgain.show();
+        }
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        if(context == null)  return false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); //ConnectivityManager 객체 생성
+
+        if (connectivityManager != null) {
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null) {
+                    //네트워크 연결되어 있는지 확인
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                        Log.i("Check InterNet","Internet connection Available");
+                        return true;
+                    }
+                }
+            }
+            else { //특정 버전 이하라면 아래진입
+                try {
+                    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo(); //네트워크 연결 정보 받아옴
+                    if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) { //네트워크 연결되어 있다면 진입
+                        Log.i("Check InterNet","Internet connection Available");
+                        return true;
+                    }
+                } catch (Exception e) {
+                    Log.i("Check InterNet","No internet connection");
+                }
+            }
+        }
+        Log.i("Check InterNet","No internet connection");
+        return false;
     }
 
     public void checkLocationPermission(){
@@ -93,7 +148,7 @@ public class SplashActivity extends AppCompatActivity{
                 }
             }else{ //위치정보를 허가받지 못했을경우 진입
                 Toast.makeText(getApplicationContext(),"위치정보를 승인하지 않으면 현재위치 기반으로 \n날씨정보를 알려드릴수 없습니다.",Toast.LENGTH_LONG).show();
-                Log.i(TAG,"위치정보를 허가 안해줌");
+                Log.i(TAG,"위치정보 권한 없음 : 위치정보를 허가 안해줌");
 
                 //허가를 받지 못했을때의 결과를 받았을때 ViewModel의 메소드를 호출하면됨
                 mavm.defaultLocation();// I call ViewModel at this part - This works
@@ -153,7 +208,7 @@ public class SplashActivity extends AppCompatActivity{
                 checkLocationSetting();
             } else {
                 Toast.makeText(getApplicationContext(), "위치정보를 승인하지 않으면 현재위치 기반으로 \n날씨정보를 알려드릴수 없습니다.", Toast.LENGTH_LONG).show();
-                Log.i(TAG, "위치정보를 허가 안해줌");
+                Log.i(TAG, "구글 플레이 : 위치정보를 허가 안해줌");
 
                 //허가를 받지 못했을때의 결과를 받았을때 ViewModel의 메소드를 호출하면됨
                 mavm.defaultLocation();// I call ViewModel at this part - This works
@@ -180,7 +235,7 @@ public class SplashActivity extends AppCompatActivity{
                         intent.putExtra("shortWeather",sw);
                         startActivity(intent);
                     }
-                },1000);
+                },2000);
             }
         });
     }

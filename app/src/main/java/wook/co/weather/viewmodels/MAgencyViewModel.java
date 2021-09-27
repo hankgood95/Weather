@@ -134,6 +134,7 @@ public class MAgencyViewModel extends AndroidViewModel { //ViewModel과 AndroidV
         sw = maRepo.getWeather(geoInfo); // this part is calling a weather api
         Log.i(TAG, "API Connection finish");
     }
+//머징
 
     public void getTime() {
 
