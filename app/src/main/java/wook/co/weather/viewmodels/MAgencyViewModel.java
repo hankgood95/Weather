@@ -31,7 +31,7 @@ public class MAgencyViewModel extends ViewModel {
         sw = maRepo.getWeather(gi);
         Log.i(TAG,"API Connection finish");
     }
-
+//머징
 
     public LiveData<ShortWeather> getWeather(){
         return sw;
