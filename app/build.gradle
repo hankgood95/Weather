@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+//Properties 선언 및 키값을 불러옴
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdkVersion 29
     buildToolsVersion "30.0.0"
@@ -12,6 +16,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "MAGENCY_API_KEY",properties['mAgency_api_key']
     }
 
     buildTypes {

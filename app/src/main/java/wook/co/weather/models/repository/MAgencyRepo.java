@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import wook.co.weather.BuildConfig;
 import wook.co.weather.interfaces.MeteorologicalAgencyAPI;
 import wook.co.weather.models.dto.GeoInfo;
 import wook.co.weather.models.dto.GpsTransfer;
@@ -54,11 +55,10 @@ public class MAgencyRepo {
         int ny = (int) gi.getLon();
 
         String baseDate = gi.getCallDate();
-
+        String apiKey = BuildConfig.MAGENCY_API_KEY; //BuildGradle에서 만든 상수 APIKey를 가져옴
 
         //응답을 하고 받아오는 부분
-        Call<ShortWeather> call = MaAPI.getShortWeather("0gr5uJKYx6b+lhmOt+Dm+fbcxVdiG7U407njrJ3YSFLlrckPeysX5fHfT0dwQRHHs4m0z5ELtDx9jcZ/Z3qoVA==",
-                266,1,"JSON",baseDate,"2300",nx,ny);
+        Call<ShortWeather> call = MaAPI.getShortWeather(apiKey, 266,1,"JSON",baseDate,"2300",nx,ny);
 
         call.enqueue(new Callback<ShortWeather>() {
             @Override
